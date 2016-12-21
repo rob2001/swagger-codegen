@@ -505,7 +505,13 @@ public abstract class AbstractJavaCodegen extends DefaultCodegen implements Code
             if (ap.getAdditionalProperties() == null) {
                 return null;
             }
-            return String.format(pattern, getTypeDeclaration(ap.getAdditionalProperties()));
+            //Handle case where we have nested collections, example: Map<String, Map<...>>
+            Property inner = ap.getAdditionalProperties();
+            if (inner instanceof MapProperty) {
+            	String innerStr = toDefaultValue(inner);
+            	return String.format(pattern, innerStr.substring(4,innerStr.length()-2));
+            }
+            return String.format(pattern, getTypeDeclaration(inner));
         } else if (p instanceof IntegerProperty) {
             IntegerProperty dp = (IntegerProperty) p;
             if (dp.getDefault() != null) {
